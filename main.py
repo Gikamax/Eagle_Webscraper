@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -8,10 +10,10 @@ from selenium.common.exceptions import ElementClickInterceptedException
 import time
 import pandas as pd # Use Dataframe as main storage and export in Class. 
 
-PATH = "C:\Program Files (x86)\chromedriver.exe"
+#PATH = "C:\Program Files (x86)\chromedriver.exe"
 URL = "https://nl.indeed.com/"
 
-driver = webdriver.Chrome(PATH)
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 def navigate_home_screen(function:str, location:str, driver:webdriver=driver):
     # Locating Searchbars
