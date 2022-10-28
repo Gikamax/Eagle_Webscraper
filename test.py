@@ -1,21 +1,16 @@
-class Test:
-    test_list = []
+from scraper import JobScraper
 
-    def __init__(self, element):
-        self.element = element
-        Test.test_list.append(element)
+x = JobScraper("Vriezenveen", "Gemeente Twenterand", "Kassamedewerker")
+x.navigate_home_screen()
+x.prepare_site()
+x.loop_through_webpages()
+print(x._data.head())
 
+y = JobScraper("Nijverdal", "Gemeente Helledoorn", "Kassamedewerker")
+y.navigate_home_screen()
+y.prepare_site()
+y.loop_through_webpages()
+print(y._data.head())
 
-t1 = Test("Hallo")
-t2 = Test("Doei")
-
-#print(Test.test_list)
-
-# Test for duplicates of list
-x = [
-    ["Timmerman", "Bramer", "Vriezenveen", "Twenterand"],
-    ["Timmerman", "Bramer", "Vriezenveen", "Twenterand"]
-]
-
-print(x)
-print(set(x))
+print("Final Result")
+print(JobScraper.df_result.head())

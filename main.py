@@ -10,26 +10,31 @@ from selenium.common.exceptions import ElementClickInterceptedException
 import time
 import pandas as pd # Use Dataframe as main storage and export in Class. 
 
-#PATH = "C:\Program Files (x86)\chromedriver.exe"
 URL = "https://nl.indeed.com/"
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
-def navigate_home_screen(function:str, location:str, driver:webdriver=driver):
-    # Locating Searchbars
-    search_bar_function = driver.find_element(By.ID, "text-input-what")
-    search_bar_location = driver.find_element(By.ID, "text-input-where")
+def navigate_home_screen(location:str, function:str = 'None', driver:webdriver=driver): # Added Possibility to search on location only
+    # If function needed
+    if function != "None":
+        # Locate SearchBar
+        search_bar_function = driver.find_element(By.ID, "text-input-what")
+        # Input Function 
+        search_bar_function.send_keys(function)
     
+    # Always need to fill in location 
+    # Locating Searchbar Location    
+    search_bar_location = driver.find_element(By.ID, "text-input-where")
     # Filling searchbars
-    search_bar_function.send_keys(function)
     search_bar_location.send_keys(location)
+    # Hitting Search button. 
     driver.find_element(By.CLASS_NAME, "yosegi-InlineWhatWhere-primaryButton").click()
 
 
 def main():
     driver.get(URL)
 
-    navigate_home_screen("Timmerman", "Enschede", driver)
+    navigate_home_screen("Enschede", "Timmerman", driver)
 
     # Create second tab for details of job
     driver.execute_script("window.open('');")

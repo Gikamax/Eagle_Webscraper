@@ -1,2 +1,3 @@
 *.cfg
 /venv_scraper
+/scraper/__pycache__
