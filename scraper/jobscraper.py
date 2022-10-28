@@ -2,18 +2,22 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
-from time import sleep
 import pandas as pd
 
 class JobScraper:
     URL = "https://nl.indeed.com/"
     radius_query = "&radius=0"
     df_result = pd.DataFrame(columns=["Functie", "Organisatie", "Plaats", "Gemeente", "URL"])
+    
+    @classmethod
+    def extract_to_csv(cls, destination_path):
+        """ Classmethod to extract all retrieved data to csv."""
+        JobScraper.df_result.drop_duplicates(inplace=True)
+        JobScraper.df_result.to_csv(destination_path + "Jobscraper_results.csv")
 
     def __init__(self, location:str, municipality:str, job:str = None):
         self.location = location
@@ -24,23 +28,32 @@ class JobScraper:
         self._data = pd.DataFrame(columns=["Functie", "Organisatie", "Plaats", "Gemeente", "URL"])
 
     def reject_all_cookies(self):
+        """Finds cookie pop-up and closes it on the Indeed Search Page."""
         reject_all_cookies = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "onetrust-reject-all-handler")))
         reject_all_cookies.click()
     
     def reject_google_login(self):
+        """Finds Google Login pop-up and closes it on the Indeed Search Page."""
         reject_google_login = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@class='icl-CloseButton icl-Card-close']")))
         reject_google_login.click()
 
     def switch_to_main_tab(self):
+        """Method to switch to Main-search tab."""
         self.driver.switch_to.window(self.driver.window_handles[0])
     
     def switch_to_second_tab(self):
+        """Method to switch to second opened tab."""
         self.driver.switch_to.window(self.driver.window_handles[1])        
     
     def create_second_tab(self):
+        """Method to create second tab."""
         self.driver.execute_script("window.open('');")
 
     def navigate_home_screen(self):
+        """
+        Method to fill in values in Indeed Home page. 
+        If provided set Job and Location. After initial load also sets Radius to 0. 
+        """
         # Navigate to home screen
         self.driver.get(JobScraper.URL)
 
@@ -63,12 +76,14 @@ class JobScraper:
         self.driver.get(url_with_radius)
     
     def prepare_site(self):
+        """Clears Cookies, Google Login and creates a second tab and switches back to main tab."""
         self.reject_all_cookies()
         self.reject_google_login()
         self.create_second_tab()
         self.switch_to_main_tab()        
 
     def jobpage_scraping(self, vacancy_url:str) -> pd.DataFrame:
+        """Method to retrieve information from the vacancy. """
         # switch to Second Tab 
         self.switch_to_second_tab()
         # Insert vacancy url in Second Tab
@@ -97,6 +112,7 @@ class JobScraper:
         return pd.DataFrame({'Functie': job_title, "Organisatie": organization, "Plaats": location, "Gemeente": self.municipality, "URL": link_to_original_vacancy}, index = [0])
     
     def loop_through_webpages(self):
+        """Method to Loop through all pages with vacancies."""
         while True:
             try:
                 jobs_list = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "mosaic-jobcards")))
@@ -124,17 +140,7 @@ class JobScraper:
         JobScraper.df_result = pd.concat([JobScraper.df_result, self._data], ignore_index=True)
         self.driver.quit()
 
-        
-
-class Test:
-    test_list = []
-
-    def __init__(self, element):
-        self.element = element
-        Test.test_list.append(element)
-
-
-t1 = Test("Hallo")
-t2 = Test("Doei")
-
-#print(Test.test_list)
+    def jobs_to_csv(self, destination_path):
+        """Method to extract information to csv."""
+        self._data.drop_duplicates(inplace=True)
+        self._data.to_csv(destination_path + f"{self.job}_data.csv")
