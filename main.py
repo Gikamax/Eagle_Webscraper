@@ -1,107 +1,27 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import ElementClickInterceptedException
-import time
-import pandas as pd # Use Dataframe as main storage and export in Class. 
-
-URL = "https://nl.indeed.com/"
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-
-def navigate_home_screen(location:str, function:str = 'None', driver:webdriver=driver): # Added Possibility to search on location only
-    # If function needed
-    if function != "None":
-        # Locate SearchBar
-        search_bar_function = driver.find_element(By.ID, "text-input-what")
-        # Input Function 
-        search_bar_function.send_keys(function)
-    
-    # Always need to fill in location 
-    # Locating Searchbar Location    
-    search_bar_location = driver.find_element(By.ID, "text-input-where")
-    # Filling searchbars
-    search_bar_location.send_keys(location)
-    # Hitting Search button. 
-    driver.find_element(By.CLASS_NAME, "yosegi-InlineWhatWhere-primaryButton").click()
+from municipality_and_place import MUNICIPALITY_AND_PLACE
+from scraper import JobScraper, helper_functions
 
 
 def main():
-    driver.get(URL)
-
-    navigate_home_screen("Enschede", "Timmerman", driver)
-
-    # Create second tab for details of job
-    driver.execute_script("window.open('');")
-    # Create Actions for moving down screen
-    actions = ActionChains(driver)
-
-    try:
-        jobs_list = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "mosaic-jobcards")))
-    except Exception as e:
-        print("Element not found")
-        driver.quit()
-    
-
-    # Delete Cookies
-    reject_all_cookies = driver.find_element(By.ID, "onetrust-reject-all-handler")
-    reject_all_cookies.click()
-
-    # Reject Google Login
-    reject_google_login = driver.find_element(By.XPATH, "//button[@class='icl-CloseButton icl-Card-close']")
-    reject_google_login.click()
-
+    helper_functions.display_banner()
     while True:
-        try: # Try block for Pop-Up windows
-            cards = jobs_list.find_elements(By.CLASS_NAME, "job_seen_beacon")
-            for card in cards:
-                job_url = card.find_element(By.TAG_NAME, 'a').get_attribute('href')
-                # switch to Second Tab 
-                driver.switch_to.window(driver.window_handles[1])
-                # Insert job_url 
-                driver.get(job_url)
-
-                # Jobpage scrapping
-                job_title = driver.find_element(By.TAG_NAME, "h1")
-                print(job_title.text)
-
-                organization = driver.find_element(By.XPATH, "//div[@class='jobsearch-InlineCompanyRating-companyHeader']/a")
-                print(organization.text)
-                location = driver.find_element(By.XPATH, "//div[@class='icl-u-xs-mt--xs icl-u-textColor--secondary jobsearch-JobInfoHeader-subtitle jobsearch-DesktopStickyContainer-subtitle']/div[2]/div")
-                print(location.text)
-                try: # original Vacancy not always present
-                    link_to_original_vacancy = driver.find_element(By.XPATH, "//div[@id='originalJobLinkContainer']/a").get_attribute('href')
-                except:
-                    link_to_original_vacancy = "No original vacancy link found."
-                print(link_to_original_vacancy)
-
-                time.sleep(2)
-                # Switch back to main
-                driver.switch_to.window(driver.window_handles[0])
-
-            try:
-                next_page_button = driver.find_element(By.CSS_SELECTOR, "a[data-testid='pagination-page-next']")
-            except Exception as e:
-                break
-            actions.move_to_element(next_page_button)
-            next_page_button.click()
-        
-        except ElementClickInterceptedException: # Error given by Selenium 
-            close_pop_up_window_button = driver.find_element(By.XPATH, "//button[@class'icl-CloseButton icl-Modal-close']")
-            close_pop_up_window_button.click()
-            pass
-
-        except Exception as e:
-            print(e)
-    time.sleep(5)
-
-    driver.quit()
-
+        helper_functions.display_introduction_text()
+        user_input = input("What do you want to do? ")
+        if user_input.lower() == 'q':
+            break
+        elif user_input.lower() == 'find all':
+            for municipality in MUNICIPALITY_AND_PLACE.keys():
+                for location in MUNICIPALITY_AND_PLACE[municipality]:
+                    _scraper = JobScraper(location, municipality)
+                    _scraper.navigate_home_screen()
+                    _scraper.prepare_site()
+                    _scraper.loop_through_webpages()
+            JobScraper.extract_to_csv("C:\\Temp\\")
+            break
+        elif user_input.lower() == 'jobtitle':
+            break
+        else:
+            print("Please add correct command.")
 
 
 if __name__ == "__main__":

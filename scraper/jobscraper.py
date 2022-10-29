@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
 import pandas as pd
 
+
 class JobScraper:
     URL = "https://nl.indeed.com/"
     radius_query = "&radius=0"
@@ -25,6 +26,7 @@ class JobScraper:
         self.job = job
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.actions = ActionChains(self.driver)
+
         self._data = pd.DataFrame(columns=["Functie", "Organisatie", "Plaats", "Gemeente", "URL"])
 
     def reject_all_cookies(self):
@@ -59,13 +61,15 @@ class JobScraper:
 
         if self.job != None:
             # Locate SearchBar
-            search_bar_function = self.driver.find_element(By.ID, "text-input-what")
+            search_bar_function = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "text-input-what")))
+            #search_bar_function = self.driver.find_element(By.ID, "text-input-what")
             # Input Function 
             search_bar_function.send_keys(self.job)
         
         # Always need to fill in location 
         # Locating Searchbar Location    
-        search_bar_location = self.driver.find_element(By.ID, "text-input-where")
+        search_bar_location = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "text-input-where")))
+        #search_bar_location = self.driver.find_element(By.ID, "text-input-where")
         # Filling searchbars
         search_bar_location.send_keys(self.location)
         # Hitting Search button. 
@@ -119,8 +123,11 @@ class JobScraper:
 
                 cards = jobs_list.find_elements(By.CLASS_NAME, "job_seen_beacon")
                 for card in cards:
-                    vacancy_url = card.find_element(By.TAG_NAME, 'a').get_attribute('href')
-                    self._data = pd.concat([self._data, self.jobpage_scraping(vacancy_url)], ignore_index=True)
+                    try:
+                        vacancy_url = card.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                        self._data = pd.concat([self._data, self.jobpage_scraping(vacancy_url)], ignore_index=True)
+                    except:
+                        print("URL not found")
 
                 try:
                     next_page_button = self.driver.find_element(By.CSS_SELECTOR, "a[data-testid='pagination-page-next']")
