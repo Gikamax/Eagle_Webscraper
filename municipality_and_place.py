@@ -4,16 +4,10 @@ MUNICIPALITY_AND_PLACE = {
         "De Pollen",
         "Den Ham",
         "Geerdijk",
-        "Hallerhoek",
         "Kloosterhaar",
-        "Linde",
-        "Magele",
-        "Meer",
-        "Noord-Meer",
         "Sibculo",
         "Vriezenveen",
         "Vroomshoop",
-        "Weitemanslanden",
         "Westerhaar-Vriezenveensewijk"
     ],
     "Tubbergen": [
@@ -22,52 +16,29 @@ MUNICIPALITY_AND_PLACE = {
         "Geesteren",
         "Haarle",
         "Harbrinkhoek",
-        "Hezingen",
-        "Klössehoek",
         "Langeveen",
         "Mander",
         "Manderveen",
         "Mariaparochie",
         "Reutum",
         "Tubbergen",
-        "Vasse",
-        "West Geesteren"
-    ], 
+        "Vasse"
+    ],
     "Dinkelland": [
-        "'t Loo",
-        "Agelo",
-        "Beekdorp",
-        "Berghum",
-        "Breklenkamp",
         "Denekamp",
         "Deurningen",
-        "Dulder",
-        "Gammelke",
-        "Groot Agelo",
-        "Het Stift",
-        "Klein Agelo",
-        "Lattrop",
-        "Lattrop-Breklenkamp",
-        "Lemselo",
-        "Noord Deurningen",
-        "Noordijk",
         "Nutter",
         "Ootmarsum",
-        "Oud Ootmarsum",
         "Rossum",
         "Saasveld",
         "Tilligte",
-        "Volthe",
-        "Weerselo",
-        "Zoeke",
-    ], 
-    "Almelo":[
+        "Weerselo"
+    ],
+    "Almelo": [
         "Aadorp",
         "Almelo",
-        "Bavinkel",
         "Bornerbroek",
-        "Mariaparochie",
-        "Tusveld"
+        "Mariaparochie"
     ]
 
 }
