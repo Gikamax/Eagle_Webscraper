@@ -9,6 +9,9 @@ from selenium.common.exceptions import ElementClickInterceptedException
 import pandas as pd
 import os
 
+options = webdriver.ChromeOptions()
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
 
 class JobScraper:
     URL = "https://nl.indeed.com/"
@@ -27,7 +30,7 @@ class JobScraper:
         self.municipality = municipality
         self.job = job
         self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()))
+            service=Service(ChromeDriverManager().install()), options=options)
         self.actions = ActionChains(self.driver)
         self._data = pd.DataFrame(
             columns=["Functie", "Organisatie", "Plaats", "Gemeente", "URL"])
