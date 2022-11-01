@@ -2,3 +2,9 @@
 /venv_scraper
 /scraper/__pycache__
 __pycache__
+*.log
+/build
+/dist
+*.csv
+*.spec
+*.exe
